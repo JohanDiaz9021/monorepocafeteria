@@ -5,7 +5,7 @@ import { productos, cantidades, lineaUnica, lineasVarias } from '../data/carrito
 test.describe('HU-03 · Carrito', () => {
   test('CP-01 el carrito empieza vacío @acceptanceTest', async ({ paginaCarrito: carrito }) => {
     await expect(carrito.estado).toHaveText('vacío');
-    await expect(carrito.subtotal).toHaveText('$0');
+    await expect(carrito.subtotal).toHaveText('$1'); // FALLO A PROPÓSITO: el valor correcto es $0
     await expect(carrito.productos).toHaveCount(0);
   });
 
