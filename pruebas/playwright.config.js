@@ -16,12 +16,12 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { browserName: 'chromium' } },
   ],
-  // Enciende la app (carpeta ../app) antes de las pruebas y la apaga al terminar.
-  // En tu equipo reutiliza la app si ya está encendida; en CI siempre la enciende.
+  // Si la app ya responde en el 3000 (el pipeline la levanta antes), la reutiliza.
+  // Si no está encendida (por ejemplo, en tu equipo), la enciende desde ../app.
   webServer: {
     command: 'npm start',
     cwd: '../app',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
   },
 });

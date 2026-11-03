@@ -2,9 +2,9 @@ name: Pruebas de aceptación
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ 'main', 'develop' ]
   pull_request:
-    branches: [ 'main' ]
+    branches: [ 'main', 'develop' ]
   workflow_dispatch:
 
 permissions:
@@ -41,8 +41,23 @@ jobs:
         working-directory: pruebas
         run: npx playwright install --with-deps chromium
 
+      # El & deja la app corriendo en segundo plano para los pasos siguientes.
+      - name: Levantar la app en el puerto 3000
+        working-directory: app
+        run: npm start &
+
+      # Pregunta a la app cada segundo, hasta 30 veces. Si no responde, el job falla aquí.
+      - name: Esperar a que la app responda
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000 > /dev/null && exit 0
+            sleep 1
+          done
+          echo "La app no respondió en http://localhost:3000"
+          exit 1
+
       # Sin continue-on-error: si una prueba de aceptación falla, el job queda en rojo.
-      # webServer (playwright.config.js) enciende la app antes de las pruebas.
+      # webServer reutiliza la app que ya levantó el paso anterior (reuseExistingServer: true).
       - name: Ejecutar pruebas @acceptanceTest
         working-directory: pruebas
         run: npx playwright test --grep @acceptanceTest
